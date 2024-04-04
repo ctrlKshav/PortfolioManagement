@@ -47,5 +47,3 @@ def plot_sector_percentage_pie(sectors, selected_sector):
     
 def plot_investment_amount(invested_amount):
     data=invested_amount    
-
-read_portfolio('portfolio.csv')

@@ -5,6 +5,7 @@ import yfinance as yf
 import pandas as pd
 import matplotlib.pyplot as plt
 import analysis1
+
 class Stock:
     def __init__(self, symbol,sector,price):
         self.symbol = symbol  
@@ -32,21 +33,6 @@ class Tickers:
         # Create a Ticker object
         ticker = yf.Ticker(ticker_symbol)
         tickers[ticker_symbol]=ticker
-
-        # data = ticker.history(start="2020-06-02", end="2020-10-07")
-        
-        # Store the price history DataFrame in the dictionary
-        # price_history[ticker_symbol] = data
-        
-        # Get stock info
-
-        # stock_info = ticker.info
-        # print(type(stock_info))
-        
-        # # Extract relevant information
-        # company_name = stock_info['longName']
-        # company_sector = stock_info['sector']
-        # market_cap = stock_info['marketCap']
 
 class Portfolio:
     def __init__(self, portfolio_csv="portfolio.csv", transactions_csv="transactions.csv"):
@@ -239,7 +225,6 @@ while True:
         print("5. View Transaction History")
         print("6. Buy some Shares")
         print("7. Sell some Shares")
-        # print("8. Check My Profit")
         print("8. View Shares listed on the Stock Exchange")
         print("9. View a specific Stock")
         print("10. Update Prices of Stocks listed on the Exchange")
@@ -285,18 +270,22 @@ while True:
         elif choice == 10:
            new_date=input('Enter Date')
            date=new_date
+           print('Test1')
            for stock in stockList:
+               print('Test2')
                stock.update_price(date)
+               print('Test3')
 
         elif choice == 11:
             print("Analysis Section")
             (sectors,invested_amount) = analysis1.read_portfolio('portfolio.csv')
             print(sectors)
             print('''1. Portfolio Analysis
-2.Sector Diversification''')
+    2.Sector Diversification''')
             user=int(input())
-
-            if user==2:
+            if user==1:
+                print(invested_amount)
+            elif user==2:
                 selected_sector = input("Enter the sector you want to analyze: ").capitalize()
                 analysis1.plot_sector_percentage_pie(sectors, selected_sector)
 
@@ -307,16 +296,3 @@ while True:
         else:
             print("Invalid choice. Please enter a valid option.")
     
-
-
-
-# # Add a stock to the portfolio
-# portfolio.buy_stock('2024-04-02',stocks['TSLA'],5)
-# portfolio.buy_stock('2024-04-02',stocks['MSFT'],5)
-# portfolio.buy_stock('2024-04-02',stocks['JPM'],5)
-
-# portfolio.sell_stock('2024-04-02',stocks['TSLA'],5)
-# portfolio.sell_stock('2024-04-02',stocks['MSFT'],2)
-
-# Display portfolio
-# portfolio.display_portfolio()
