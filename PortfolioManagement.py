@@ -1,15 +1,51 @@
 ﻿import csv
 import os
 import datetime
+import yfinance as yf
+import pandas as pd
 
 class Stock:
     def __init__(self, symbol,sector,price):
         self.symbol = symbol  
         self.sector = sector
-        self.price = price
+        self.price=price
+        self.ticker=Tickers.tickers[symbol]
+        self.price_history=self.ticker.history(period='max')
    
-    def __str__(self):
+    def update_price(self,date):
+        self.price=self.price_history.loc[date,'Close']
+
+    def  __str__(self):
         return f"\nStock : {self.symbol}\nSector : {self.sector}\n Price: {self.price}\n "
+
+class Tickers:
+    # List of 10 popular stock tickers
+
+    def __init__(self) -> None:
+        self.price=0
+    ticker_symbols = ['AAPL', 'GOOG','MSFT', 'AMZN','META', 'TSLA', 'NVDA', 'NFLX', 'JPM', 'V']
+    tickers={}
+    price_history={}
+    # Iterate through each ticker
+    for ticker_symbol in ticker_symbols:
+        # Create a Ticker object
+        ticker = yf.Ticker(ticker_symbol)
+        tickers[ticker_symbol]=ticker
+
+        # data = ticker.history(start="2020-06-02", end="2020-10-07")
+        
+        # Store the price history DataFrame in the dictionary
+        # price_history[ticker_symbol] = data
+        
+        # Get stock info
+
+        # stock_info = ticker.info
+        # print(type(stock_info))
+        
+        # # Extract relevant information
+        # company_name = stock_info['longName']
+        # company_sector = stock_info['sector']
+        # market_cap = stock_info['marketCap']
 
 class Portfolio:
     def __init__(self, portfolio_csv="portfolio.csv", transactions_csv="transactions.csv"):
@@ -140,18 +176,31 @@ class Portfolio:
             reader = csv.reader(file)
             for row in reader:
                 print(row)
+aapl=Stock("AAPL", "Technology", 150.0)
+goog=Stock("GOOG", "Technology", 200.0)
+msft=Stock("MSFT", "Technology", 300.0)
+amzn=Stock("AMZN", "Technology", 350.0)
+meta=Stock("META", "Retail", 140.0)
+tsla=Stock("TSLA", "Automotive", 650.0)
+nvda=Stock("NVDA", "Technology", 400.0)
+nflx=Stock("NFLX", "Entertainment", 450.0)
+jpm=Stock("JPM", "Entertainment", 170.0)
+v=Stock("V", "Finance", 120.0)
+
+stockList=[aapl,goog,msft,amzn,meta,tsla,nvda,nflx,jpm,v]
+
 
 stocks = {
-    "AAPL": Stock("AAPL", "Technology", 150.0),
-    "GOOG": Stock("GOOG", "Technology", 200.0),
-    "MSFT": Stock("MSFT", "Technology", 300.0),
-    "AMZN": Stock("AMZN", "Technology", 350.0),
-    "TSLA": Stock("TSLA", "Automotive", 650.0),
-    "JPM": Stock("JPM", "Finance", 120.0),
-    "WMT": Stock("WMT", "Retail", 140.0),
-    "DIS": Stock("DIS", "Entertainment", 170.0),
-    "NFLX": Stock("NFLX", "Entertainment", 450.0),
-    "NVDA": Stock("NVDA", "Technology", 400.0)
+    "AAPL": aapl,
+    "GOOG": goog,
+    "MSFT": msft,
+    "AMZN": amzn,
+    "META": meta,
+    "TSLA": tsla,
+    "NVDA": nvda,
+    "NFLX": nflx,
+    "JPM": jpm ,
+    "V": v
 }
 
 
@@ -174,7 +223,7 @@ while True:
         # print("8. Check My Profit")
         print("8. View Shares listed on the Stock Exchange")
         print("9. View a specific Stock")
-        # print("10. Update Prices of Stocks listed on the Exchange")
+        print("10. Update Prices of Stocks listed on the Exchange")
         print("11. Open Analysis Section")
         print("0. Exit the program")
 
@@ -213,10 +262,9 @@ while True:
         elif choice == 9:
             stock_name = input("Enter the name of the stock to view details: ").strip()
             print(stocks[stock_name])
-        # elif choice == 10:
-        #     BSE.updatePrices()
-        #     NSE.updatePrices()
-        #     print("Prices Updated")
+        elif choice == 10:
+           for stock in stockList:
+               stock.update_price(input("Enter Date"))
         elif choice == 11:
             print("Open Analysis Section")
 
