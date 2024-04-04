@@ -4,7 +4,7 @@ import datetime
 import yfinance as yf
 import pandas as pd
 import matplotlib.pyplot as plt
-
+import analysis1
 class Stock:
     def __init__(self, symbol,sector,price):
         self.symbol = symbol  
@@ -115,13 +115,29 @@ class Portfolio:
 
     def buy_stock(self, date, stock,quantity):
         total_cost = stock.price * quantity
+        available_quantity=0
         if total_cost > self.balance:
             print("Insufficient balance to buy this stock.")
             return
-        
-        with open(self.portfolio_csv, 'a', newline='') as file:
+        stock_exists = False
+        updated_rows = []
+        with open(self.portfolio_csv, 'r', newline='') as file:
+            reader = csv.reader(file, delimiter=';')
+            for row in reader:
+                if row and row[1] == stock.symbol:
+                    row[3] = str(int(row[3]) + quantity)  # Update quantity
+                    stock_exists = True
+                updated_rows.append(row)
+
+    # If the stock doesn't exist, add a new entry
+        if not stock_exists:
+            updated_rows.append([date, stock.symbol, stock.sector, quantity, stock.price])
+
+    # Write back the updated data to the portfolio file
+        with open(self.portfolio_csv, 'w', newline='') as file:
             writer = csv.writer(file, delimiter=';')
-            writer.writerow([date, stock.symbol, stock.sector, quantity, stock.price])
+            writer.writerows(updated_rows)
+
         self.log_transaction("Buy",date, stock, quantity, )
         self.balance -= total_cost
 
@@ -134,12 +150,12 @@ class Portfolio:
             reader = csv.reader(file, delimiter=';')
             for row in reader:
                 if row[1] == stock.symbol:
-                    available_quantity = int(row[3])
+                    available_quantity += int(row[3])
                     flag=True
-                    break
         if not flag:
             print("Stock not in your portfolio ")
             return
+        print(available_quantity)
         if quantity > available_quantity:
             print("Insufficient shares to sell.")
             return
@@ -156,6 +172,8 @@ class Portfolio:
             reader = csv.reader(file_in, delimiter=';')
             writer = csv.writer(file_out, delimiter=';')
             for row in reader:
+                if not row:
+                    continue
                 if row[1] == stock.symbol:
                     row[3] = str(int(row[3]) - quantity)
                     if int(row[3]) == 0:  # If quantity becomes zero, skip writing the row
@@ -271,7 +289,17 @@ while True:
                stock.update_price(date)
 
         elif choice == 11:
-            print("Open Analysis Section")
+            print("Analysis Section")
+            (sectors,invested_amount) = analysis1.read_portfolio('portfolio.csv')
+            print(sectors)
+            print('''1. Portfolio Analysis
+2.Sector Diversification''')
+            user=int(input())
+
+            if user==2:
+                selected_sector = input("Enter the sector you want to analyze: ").capitalize()
+                analysis1.plot_sector_percentage_pie(sectors, selected_sector)
+
 
         elif choice == 0:
             print("Exiting the program...")
