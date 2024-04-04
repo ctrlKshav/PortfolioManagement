@@ -5,13 +5,31 @@ def read_portfolio(filename):
     portfolio = {}
     with open(filename, 'r') as file:
         csv_reader = csv.reader(file, delimiter=';')
+        next(csv_reader)
+        initialDate=''
+        invested_amount=[]
+        invested_amount_daily=0
+
         for row in csv_reader:
+            if not row or (row[0].strip()) == "":
+                continue  # Skip empty lines or lines with only spaces
             date, name, sector, quantity, price = row
-            quantity = int(quantity)
+        
+            if not date==initialDate:
+                initialDate=date
+                invested_amount.append(invested_amount_daily)
+                invested_amount_daily=0
+            
+            quantity,price= int(quantity),float(price)
+            invested_amount_daily+=quantity*price
+
+
+
             if sector in portfolio:
                 portfolio[sector] += quantity
             else:
                 portfolio[sector] = quantity
+    print(invested_amount)
     return portfolio
 
 def plot_sector_percentage_pie(portfolio, selected_sector):

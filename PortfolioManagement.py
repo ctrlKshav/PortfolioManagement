@@ -3,6 +3,7 @@ import os
 import datetime
 import yfinance as yf
 import pandas as pd
+import matplotlib.pyplot as plt
 
 class Stock:
     def __init__(self, symbol,sector,price):
@@ -209,8 +210,8 @@ stocks = {
 #We come here after pyQT(if it is created)
 
 portfolio = Portfolio()
-date='2024-12-12'
 
+date='2024-12-12'
 while True:
         print("What's on your mind?")
         print("1. Check your Account balance")
@@ -262,9 +263,13 @@ while True:
         elif choice == 9:
             stock_name = input("Enter the name of the stock to view details: ").strip()
             print(stocks[stock_name])
+
         elif choice == 10:
+           new_date=input('Enter Date')
+           date=new_date
            for stock in stockList:
-               stock.update_price(input("Enter Date"))
+               stock.update_price(date)
+
         elif choice == 11:
             print("Open Analysis Section")
 

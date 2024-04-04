@@ -61,7 +61,7 @@ class StockAnalyzer:
         except Exception as e:
             print("Error:", e)
 
-if __name__ == "_main_":
+if __name__ == "__main__":
     analyzer = StockAnalyzer()
     stock_name = input("Enter the name of the stock (Ticker Symbol): ").upper()
     print("Volatility of", stock_name + ":", analyzer.calculate_volatility(stock_name))
