@@ -15,7 +15,10 @@ class Stock:
         self.price_history=self.ticker.history(period='max')
    
     def update_price(self,date):
-        self.price=self.price_history.loc[date,'Close']
+        
+            self.price=self.price_history.loc[date,'Close']
+        
+            
 
     def  __str__(self):
         return f"\nStock : {self.symbol}\nSector : {self.sector}\n Price: {self.price}\n "
@@ -23,16 +26,26 @@ class Stock:
 class Tickers:
     # List of 10 popular stock tickers
 
-    def __init__(self) -> None:
-        self.price=0
     ticker_symbols = ['AAPL', 'GOOG','MSFT', 'AMZN','META', 'TSLA', 'NVDA', 'NFLX', 'JPM', 'V']
     tickers={}
-    price_history={}
     # Iterate through each ticker
     for ticker_symbol in ticker_symbols:
         # Create a Ticker object
         ticker = yf.Ticker(ticker_symbol)
         tickers[ticker_symbol]=ticker
+    @classmethod
+    def get_ticker_info(self,ticker):
+        info=Tickers.tickers[ticker].info
+        company_name = info['longName']
+        company_sector = info['sector']
+        market_cap = info['marketCap']
+    
+    # Print the information
+        print(f"Company Name: {company_name}")
+        print(f"Market Cap: {market_cap}\n")
+
+
+
 
 class Portfolio:
     def __init__(self, portfolio_csv="portfolio.csv", transactions_csv="transactions.csv"):
@@ -181,6 +194,8 @@ class Portfolio:
             reader = csv.reader(file)
             for row in reader:
                 print(row)
+
+
 aapl=Stock("AAPL", "Technology", 150.0)
 goog=Stock("GOOG", "Technology", 200.0)
 msft=Stock("MSFT", "Technology", 300.0)
@@ -216,6 +231,7 @@ stocks = {
 portfolio = Portfolio()
 
 date='2024-12-12'
+
 while True:
         print("What's on your mind?")
         print("1. Check your Account balance")
@@ -230,69 +246,78 @@ while True:
         print("10. Update Prices of Stocks listed on the Exchange")
         print("11. Open Analysis Section")
         print("0. Exit the program")
+        try:
+            choice = int(input("Enter your choice: "))
+            if choice == 1:
+                print(portfolio.check_balance())
+            elif choice == 2:
+                amount = float(input("Enter the amount to deposit: "))
+                portfolio.deposit_balance(amount)
+            elif choice == 3:
+                amount = float(input("Enter the amount to withdraw: "))
+                portfolio.withdraw_funds(amount)
+            elif choice == 4:
+                portfolio.display_portfolio()
+            elif choice == 5:
+                portfolio.view_transaction_history()
+            elif choice == 6:
+                stock_name = input("Enter the name of the stock to buy: ").strip()
+                if stock_name not in stocks.keys():
+                    print('Stock Not Listed on the Exchange')
+                    break
+                quantity = int(input("Enter the quantity to buy: "))
+                portfolio.buy_stock(date,stocks[stock_name], quantity)
+            elif choice == 7:
+                stock_name = input("Enter the name of the stock to sell: ").strip()
+                if stock_name not in stocks.keys():
+                    print('Stock Not Listed on the Exchange')
+                    break
+                quantity = int(input("Enter the quantity to sell: "))
+                portfolio.sell_stock(date,stocks[stock_name], quantity)
+            # elif choice == 7:
+            #     portfolio.calculateProfit()
+            elif choice == 8:
+                for stock in stocks:
+                    print(stocks.get(stock))
+            elif choice == 9:
+                stock_name = input("Enter the name of the stock to view details: ").strip()
+                print(stocks[stock_name])
+                Tickers.get_ticker_info(stock_name)
 
-        choice = int(input("Enter your choice: "))
-        if choice == 1:
-            print(portfolio.check_balance())
-        elif choice == 2:
-            amount = float(input("Enter the amount to deposit: "))
-            portfolio.deposit_balance(amount)
-        elif choice == 3:
-            amount = float(input("Enter the amount to withdraw: "))
-            portfolio.withdraw_funds(amount)
-        elif choice == 4:
-            portfolio.display_portfolio()
-        elif choice == 5:
-            portfolio.view_transaction_history()
-        elif choice == 6:
-            stock_name = input("Enter the name of the stock to buy: ").strip()
-            if stock_name not in stocks.keys():
-                print('Stock Not Listed on the Exchange')
+            elif choice == 10:
+                new_date=input('Enter Date')
+                date=new_date
+                
+                for stock in stockList:
+                    try:
+                        stock.update_price(date)    
+                    except(Exception):
+                        print("Enter Valid Date")
+                        break
+                    
+
+            elif choice == 11:
+                print("Analysis Section")
+                (sectors,invested_amount) = analysis1.read_portfolio('portfolio.csv')
+                print(sectors)
+                print('''1. Portfolio Analysis
+        2.Sector Diversification''')
+                user=int(input())
+                if user==1:
+                    print(invested_amount)
+                elif user==2:
+                    selected_sector = input("Enter the sector you want to analyze: ").capitalize()
+                    analysis1.plot_sector_percentage_pie(sectors, selected_sector)
+
+
+            elif choice == 0:
+                print("Exiting the program...")
                 break
-            quantity = int(input("Enter the quantity to buy: "))
-            portfolio.buy_stock(date,stocks[stock_name], quantity)
-        elif choice == 7:
-            stock_name = input("Enter the name of the stock to sell: ").strip()
-            if stock_name not in stocks.keys():
-                print('Stock Not Listed on the Exchange')
-                break
-            quantity = int(input("Enter the quantity to sell: "))
-            portfolio.sell_stock(date,stocks[stock_name], quantity)
-        # elif choice == 7:
-        #     portfolio.calculateProfit()
-        elif choice == 8:
-            for stock in stocks:
-                print(stocks.get(stock))
-        elif choice == 9:
-            stock_name = input("Enter the name of the stock to view details: ").strip()
-            print(stocks[stock_name])
-
-        elif choice == 10:
-           new_date=input('Enter Date')
-           date=new_date
-           print('Test1')
-           for stock in stockList:
-               print('Test2')
-               stock.update_price(date)
-               print('Test3')
-
-        elif choice == 11:
-            print("Analysis Section")
-            (sectors,invested_amount) = analysis1.read_portfolio('portfolio.csv')
-            print(sectors)
-            print('''1. Portfolio Analysis
-    2.Sector Diversification''')
-            user=int(input())
-            if user==1:
-                print(invested_amount)
-            elif user==2:
-                selected_sector = input("Enter the sector you want to analyze: ").capitalize()
-                analysis1.plot_sector_percentage_pie(sectors, selected_sector)
-
-
-        elif choice == 0:
-            print("Exiting the program...")
-            break
-        else:
-            print("Invalid choice. Please enter a valid option.")
+            else:
+                print("Invalid choice. Please enter a valid option.")
+           
+        except(Exception) as e :
+            #We use this statement to find out what error lies in the code
+            # print(e)
+            print("Invalid Format")
     
